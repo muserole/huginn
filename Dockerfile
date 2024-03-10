@@ -1,5 +1,5 @@
 # 使用官方的 Ruby 镜像作为基础镜像
-FROM ruby:2.7
+FROM ruby
 
 # 安装系统依赖
 RUN apt-get update && apt-get install -y \
