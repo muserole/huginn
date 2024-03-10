@@ -3,6 +3,9 @@ FROM rubylang/ruby:3.2-jammy
 COPY docker/scripts/prepare /scripts/
 RUN /scripts/prepare
 
+COPY docker/multi-process/scripts/standalone-packages /scripts/
+RUN /scripts/standalone-packages
+
 WORKDIR /app
 
 ENV HOME=/app
@@ -39,5 +42,14 @@ RUN APP_SECRET_TOKEN=secret DATABASE_ADAPTER=mysql2 ON_HEROKU=true bundle exec r
 
 EXPOSE 3000
 
-COPY ["docker/scripts/setup_env", "docker/single-process/scripts/init", "/scripts/"]
+COPY docker/multi-process/scripts/supervisord.conf /etc/supervisor/
+COPY ["docker/multi-process/scripts/bootstrap.conf", \
+      "docker/multi-process/scripts/foreman.conf", \
+      "docker/multi-process/scripts/mysqld.conf", "/etc/supervisor/conf.d/"]
+COPY ["docker/multi-process/scripts/bootstrap.sh", \
+      "docker/multi-process/scripts/foreman.sh", \
+      "docker/multi-process/scripts/init", \
+      "docker/scripts/setup_env", "/scripts/"]
 CMD ["/scripts/init"]
+
+VOLUME /var/lib/mysql
