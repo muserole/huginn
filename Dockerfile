@@ -1,5 +1,8 @@
-# 使用官方的 Ruby 镜像作为基础镜像
+# 使用官方的Ruby镜像作为基础
 FROM ruby
+
+# 设置工作目录
+WORKDIR /app
 
 # 安装系统依赖
 RUN apt-get update && apt-get install -y \
@@ -7,33 +10,23 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     libxslt1-dev \
     nodejs \
-    imagemagick \
-    libpq-dev \
-    postgresql-client \
-    curl \
-    git \
- && rm -rf /var/lib/apt/lists/*
+    sqlite3 \
+    && rm -rf /var/lib/apt/lists/*
+
+# 复制项目文件到工作目录
+COPY . .
+
+# 安装依赖
+RUN bundle install
 
 # 设置环境变量
 ENV RAILS_ENV=production
 
-# 设置工作目录
-WORKDIR /huginn
+# 运行数据库迁移和预编译资源
+RUN bundle exec rake db:create db:migrate assets:precompile
 
-# 复制当前目录中的所有文件到容器中的 /huginn 目录下
-COPY . /huginn
-
-# 安装依赖
-RUN bundle install --deployment --without development test
-
-# 创建数据库并运行迁移
-RUN bundle exec rake db:create db:migrate
-
-# 预编译 assets
-RUN bundle exec rake assets:precompile
-
-# 暴露 Huginn 使用的端口（默认是 3000）
+# 暴露端口
 EXPOSE 3000
 
-# 容器启动时运行的命令
+# 启动Huginn
 CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]
