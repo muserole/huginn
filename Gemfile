@@ -42,6 +42,10 @@ gem 'slack-notifier', '~> 1.0.0'  # SlackAgent
 gem 'twilio-ruby', '~> 5.62.0'    # TwilioAgent
 gem 'xmpp4r', '~> 0.5.6'          # JabberAgent
 
+gem 'brotli'
+
+
+
 # Weibo Agents
 # FIXME needs to loosen omniauth dependency, add rest-client
 gem 'weibo_2', github: 'albertsun/weibo_2', branch: 'master'
